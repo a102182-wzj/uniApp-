@@ -1,0 +1,55 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "新闻首页",
+				"navigationBarBackgroundColor": "#b4b4b4",
+				"enablePullDownRefresh": true,
+				"onReachBottomDistance": 50,
+				"backgroundColorTop": "#e8e8e8",
+				"backgroundColorBottom": "#e8e8e8",
+				"navigationBarShadow": {
+					"colorType": "grey"
+				},
+				"onReachBottomDistance": 50
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录模块",
+				"enablePullDownRefresh": true,
+				"onReachBottomDistance": 50,
+				"backgroundColorTop": "#e8e8e8",
+				"backgroundColorBottom": "#e8e8e8"
+
+			}
+		}
+	],
+	"tabBar": {
+		"color": "#e8e8e8",
+		"selectedColor": "#007AFF",
+		"borderStyle": "black",
+		"backgroundColor": "#FFFFFF",
+		"height": "50px",
+		"fontSize": "10px",
+		"iconWidth": "24px",
+		"spacing": "3upx",
+		"list": [{
+				"pagePath": "pages/index/index",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/login/login",
+				"text": "登录"
+			}
+		]
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	}
+}

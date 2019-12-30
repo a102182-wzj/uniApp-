@@ -1,0 +1,15 @@
+{
+  "navigationBarTitleText": "新闻首页",
+  "navigationBarBackgroundColor": "white",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 50,
+  "backgroundColorTop": "#e8e8e8",
+  "backgroundColorBottom": "#e8e8e8",
+  "navigationBarShadow": {
+    "colorType": "grey"
+  },
+  "usingComponents": {
+    "wuc-tab": "/components/wuc-tab/wuc-tab",
+    "uni-icons": "/components/uni-icons/uni-icons"
+  }
+}
