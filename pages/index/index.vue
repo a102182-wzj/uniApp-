@@ -14,15 +14,17 @@
 		<wuc-tab id="tab" :tab-list="tabList" :tabCur.sync="currentTab" @change="tabClick"></wuc-tab>
 		<swiper :current="currentTab" @change="swiperChange" :style="{height:footerHeight+'px'}">
 			<swiper-item v-for="(item,index1) in tabList" :key="index1">
-				<view class="listItem" v-for="(item,index) in newsListTotal[currentTab]" :key="index">
-					<view :style="{width:'400upx',fontSize:'25upx'}">
-						<view>{{item.title| ellipsis}}</view>
-						<view style="margin-top: 20upx;font-size: 20upx;color:#b4b4b4">{{item.passtime}}</view>
+				<scroll-view @scrolltolower="scrolltoLower()" :style="{height:footerHeight+'px'}" scroll-y="true">
+					<view class="listItem" v-for="(item,index) in newsListTotal[currentTab]" :key="index">
+						<view :style="{width:'400upx',fontSize:'25upx'}">
+							<view>{{item.title| ellipsis}}</view>
+							<view style="margin-top: 20upx;font-size: 20upx;color:#b4b4b4">{{item.passtime}}</view>
+						</view>
+						<image :src="item.image" :style="{width:'250upx',height:'100%'}">
+							<uni-icons type="arrowright" size="15"></uni-icons>
+						</image>
 					</view>
-					<image :src="item.image" :style="{width:'250upx',height:'100%'}">
-						<uni-icons type="arrowright" size="15"></uni-icons>
-					</image>
-				</view>
+				</scroll-view>
 			</swiper-item>
 		</swiper>
 	</view>
@@ -32,6 +34,7 @@
 	import uniIcons from "@/components/uni-icons/uni-icons.vue"
 	import liuyunoTabs from "@/components/liuyuno-tabs/liuyuno-tabs.vue";
 	import WucTab from '@/components/wuc-tab/wuc-tab.vue';
+	import utils from '../../utils/request.js';
 	import {
 		mapState,
 		mapMutations,
@@ -70,99 +73,48 @@
 		created() {
 			uni.getSystemInfo({
 				success: (res) => {
-					console.log('手机信息', res.windowHeight)
 					this.screenHeight = `${res.windowHeight}px`
-					console.log('screenHeight', this.screenHeight)
 				}
 			})
 			console.log('正在创建实例')
-			uni.showLoading({
-				title: '正在加载中',
-				mask: true
-			})
-			uni.request({
-				//#ifdef H5
-				url: '/api/getWangYiNews',
-				//#endif
-				//#ifndef H5
-				url: 'https://api.apiopen.top/getWangYiNews',
-				//#endif
-				method: 'POST',
-				success: (res) => {
-					uni.hideLoading()
-					if (res.data.code == 200) {
+			let data=utils.request('wangyi','/getWangYiNews',{},'POST')
+			console.log('data11111',data)
+			// let data=request('wangyi','/getWangYiNews',{},'POST')
+			// console.log('data',data)
+			// uni.showLoading({
+			// 	title: '正在加载中',
+			// 	mask: true
+			// })
+			// uni.request({
+			// 	//#ifdef H5
+			// 	url: '/api/getWangYiNews',
+			// 	//#endif
+			// 	//#ifndef H5
+			// 	url: 'https://api.apiopen.top/getWangYiNews',
+			// 	//#endif
+			// 	method: 'POST',
+			// 	success: (res) => {
+			// 		uni.hideLoading()
+			// 		if (res.data.code == 200) {
 
-						this.newsListTotal.push(res.data.result)
-						console.log('this.newsListTotal', this.newsListTotal)
-						// this.getNewsList(res.data.result)
-					} else {
-						uni.showToast({
-							title: res.data.message
-						})
-					}
+			// 			this.newsListTotal.push(res.data.result)
+			// 			console.log('this.newsListTotal', this.newsListTotal)
+			// 			// this.getNewsList(res.data.result)
+			// 		} else {
+			// 			uni.showToast({
+			// 				title: res.data.message
+			// 			})
+			// 		}
 
-				},
-				fail: (res) => {
-					debugger;
-				}
-			})
+			// 	},
+			// 	fail: (res) => {
+			// 		debugger;
+			// 	}
+			// })
 		},
 		//页面触底生命周期
 		onReachBottom() {
-			console.log('执行了触底')
-			console.log('newsList', this.newsList)
-			switch (this.currentTab) {
-				case 0:
-					uni.showToast({
-						title: "已经是最后一页",
-						duration: 1000,
-						icon: 'none'
-					})
-					break;
-				case 1:
-					uni.showToast({
-						title: "加载中",
-						icon: 'loading',
-						mask: true
-					})
-					this.page++
-					let url = ''
-					//#ifdef H5
-					url =
-						`/tenct/irs/rcd?cid=56&ext=games&token=c786875b8e04da17b24ea5e332745e0f&num=20&expIds=20190106A13PFT%7C20190108A04MLS&page=${this.page}`
-					//#endif
-					//#ifndef H5
-					url =
-						`https://pacaio.match.qq.com/irs/rcd?cid=56&ext=games&token=c786875b8e04da17b24ea5e332745e0f&num=20&expIds=20190106A13PFT%7C20190108A04MLS&page=${this.page}`
-					//#endif
-					uni.request({
-						url: url,
-						method: 'POST',
-						success: (res) => {
-							uni.hideToast()
-							console.log('执行了1')
-							let data = res.data.data
-							console.log('data', data)
-							let tenctNews = []
-							for (let i = 0; i < data.length; i++) {
-								let news = {
-									image: data[i].bimg,
-									passtime: data[i]['publish_time'],
-									path: data[i].url,
-									title: data[i].title
-								}
-								tenctNews.push(news)
-							}
-							let payload = {
-								index: this.currentTab,
-								data: tenctNews
-							}
-							// this.newsListTotal=this.newsListTotal[this.currentTab].concat(tenctNews)
-							this.$set(this.newsListTotal, this.currentTab, this.newsListTotal[this.currentTab].concat(tenctNews))
-							console.log('newsListTotal', this.newsListTotal)
-						},
-					})
-			}
+
 		},
 		methods: {
 			getHeight(selector) {
@@ -175,16 +127,16 @@
 					}).exec()
 				})
 			},
-			async getHeights(){
+			async getHeights() {
 				console.log('执行了渲染完毕')
-				let headerHeight=await this.getHeight('#header')
-				let tabHeight=await this.getHeight('#tab')
-				console.log('headerHeight',headerHeight)
-				console.log('tabHeight',tabHeight)
-				let screenHeight=parseInt(this.screenHeight)
-				console.log('screenHeight',screenHeight)
-				this.footerHeight=screenHeight-headerHeight-tabHeight
-				console.log('footerHeight',this.footerHeight)
+				let headerHeight = await this.getHeight('#header')
+				let tabHeight = await this.getHeight('#tab')
+				console.log('headerHeight', headerHeight)
+				console.log('tabHeight', tabHeight)
+				let screenHeight = parseInt(this.screenHeight)
+				console.log('screenHeight', screenHeight)
+				this.footerHeight = screenHeight - headerHeight - tabHeight
+				console.log('footerHeight', this.footerHeight)
 			},
 			swiperChange(swiper) {
 				this.tabClick(swiper.detail.current)
@@ -205,7 +157,7 @@
 								`https://pacaio.match.qq.com/irs/rcd?cid=56&ext=games&token=c786875b8e04da17b24ea5e332745e0f&num=20&expIds=20190106A13PFT%7C20190108A04MLS&page=${this.page}`
 							//#endif
 					}
-					uni.showToast({
+					uni.showLoading({
 						title: '正在加载',
 						icon: 'loading',
 						mask: true
@@ -230,6 +182,62 @@
 							// this.getNewsList(tenctNews)
 						},
 					})
+				}
+			},
+			scrolltoLower() {
+				console.log('执行了触底')
+				console.log('newsList', this.newsList)
+				switch (this.currentTab) {
+					case 0:
+						uni.showToast({
+							title: "已经是最后一页",
+							duration: 1000,
+							icon: 'none'
+						})
+						break;
+					case 1:
+						uni.showToast({
+							title: "加载中",
+							icon: 'loading',
+							mask: true
+						})
+						this.page++
+						let url = ''
+						//#ifdef H5
+						url =
+							`/tenct/irs/rcd?cid=56&ext=games&token=c786875b8e04da17b24ea5e332745e0f&num=20&expIds=20190106A13PFT%7C20190108A04MLS&page=${this.page}`
+						//#endif
+						//#ifndef H5
+						url =
+							`https://pacaio.match.qq.com/irs/rcd?cid=56&ext=games&token=c786875b8e04da17b24ea5e332745e0f&num=20&expIds=20190106A13PFT%7C20190108A04MLS&page=${this.page}`
+						//#endif
+						uni.request({
+							url: url,
+							method: 'POST',
+							success: (res) => {
+								uni.hideToast()
+								console.log('执行了1')
+								let data = res.data.data
+								console.log('data', data)
+								let tenctNews = []
+								for (let i = 0; i < data.length; i++) {
+									let news = {
+										image: data[i].bimg,
+										passtime: data[i]['publish_time'],
+										path: data[i].url,
+										title: data[i].title
+									}
+									tenctNews.push(news)
+								}
+								let payload = {
+									index: this.currentTab,
+									data: tenctNews
+								}
+								// this.newsListTotal=this.newsListTotal[this.currentTab].concat(tenctNews)
+								this.$set(this.newsListTotal, this.currentTab, this.newsListTotal[this.currentTab].concat(tenctNews))
+								console.log('newsListTotal', this.newsListTotal)
+							},
+						})
 				}
 			},
 			...mapActions('News', ['getNewsList', 'concatNewsList'])
