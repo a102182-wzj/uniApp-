@@ -6,13 +6,12 @@
 				"navigationBarTitleText": "新闻首页",
 				"navigationBarBackgroundColor": "#b4b4b4",
 				"enablePullDownRefresh": true,
-				"onReachBottomDistance": 50,
+				"onReachBottomDistance": 1,
 				"backgroundColorTop": "#e8e8e8",
 				"backgroundColorBottom": "#e8e8e8",
 				"navigationBarShadow": {
 					"colorType": "grey"
-				},
-				"onReachBottomDistance": 50
+				}
 			}
 		},
 		{
